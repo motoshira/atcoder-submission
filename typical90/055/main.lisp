@@ -20,28 +20,49 @@
       (princ obj stream)
       (terpri stream))))
 
+(deftype uint () '(unsigned-byte 60))
+
+(defstruct pair
+  (sum 0 :type uint)
+  (cnt 0 :type uint))
+
 (defun main ()
   (let* ((n (read))
          (p (read))
          (q (read))
          (as (loop repeat n collect (read))))
+    (declare (uint n p q)
+             (list as))
     (let ((stack nil)
           (res 0))
-      (push (list 1 0) stack)
+      (declare (list stack)
+               (uint res))
+      (push (make-pair :sum 1
+                       :cnt 0)
+            stack)
       (dolist (a as)
+        (declare (fixnum a))
         (let ((tmp nil))
-          (loop for (val cnt) in stack
-                do (let ((next (rem (* val a)
-                                    p)))
-                     (cond
-                       ((< cnt 4)
-                        (push (list next (1+ cnt))
-                              tmp))
-                       (:else
-                        (when (= next q)
-                          (incf res))))))
-          (dolist (xs tmp)
-            (push xs stack))))
+          (declare (list tmp))
+          (dolist (pair stack)
+            (declare (pair pair))
+            (with-slots ((val pri)
+                         (cnt pos))
+                pair
+              (declare (uint val cnt))
+              (let ((next (rem (the uint (* val a))
+                               p)))
+                (declare (uint next))
+                (cond
+                  ((< cnt 4)
+                   (push (make-pair :pri next
+                                    :pos (1+ cnt))
+                         tmp))
+                  (:else
+                   (when (= next q)
+                     (incf res)))))))
+          (dolist (pair tmp)
+            (push pair stack))))
       (println res))))
 
 #-swank (main)
