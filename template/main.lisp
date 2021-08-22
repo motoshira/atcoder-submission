@@ -1,4 +1,4 @@
-(in-package :cl-user)
+(in-package #:cl-user)
 
 ;;------------------------------Preferences------------------------------
 
@@ -12,6 +12,8 @@
   (pushnew :inline-generic-funcion *features*))
 
 ;;---------------------------------Body---------------------------------
+
+(in-package #:cl-user)
 
 (declaim (inline println))
 (defun println (obj &optional (stream *standard-output*))
