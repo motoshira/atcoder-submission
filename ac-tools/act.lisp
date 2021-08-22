@@ -1,21 +1,14 @@
-(defvar *template-dir* "~/Dropbox/template/main.lisp")
+(defparameter *template-dir* "~/ghq/github.com/motoshira/atcoder-submission/template/main.lisp")
 
 #+swank
 (defun get-clipboard ()
   (with-output-to-string (out)
-    (sb-ext:run-program "/usr/bin/xclip" '("-o") :output out)))
+    (sb-ext:run-program "/usr/bin/pbpaste" '() :output out)))
 
 #+swank
 (defun run ()
-  (with-input-from-string (in (get-clipboard))
-    (let ((dat (loop for line = (read-line in nil :eof)
-                     for n = (if (eq line :eof) 0 (length line))
-                     until (eq line :eof)
-                     collect (format nil "~a~%" line)
-                         into res
-                     finally (return (apply #'concatenate 'string res)))))
-      (with-input-from-string (*standard-input* dat)
-        (main)))))
+  (with-input-from-string (*standard-input* (get-clipboard))
+    (main)))
 
 #+swank
 (defun copy-flie (from to)
@@ -34,7 +27,7 @@
   (ensure-directories-exist (merge-pathnames folder-name (truename "."))))
 
 #+swank
-(defun make-project (project-name &optional (child-filenames '("a" "b" "c" "d" "e" "f")))
+(defun make-project (project-name &optional (child-filenames '("a" "b" "c" "d" "e" "f" "g" "h")))
   (flet ((println (obj)
            (princ obj)
            (terpri)))
@@ -43,8 +36,8 @@
     (format t "Creating ~a..." (truename (concatenate 'string project-name "/")))
     (println "Done.")
     (dolist (c child-filenames)
-      a        (let ((child-dir (mkdir (concatenate 'string project-name "/" c "/"))))
-                 (format t "Copying ~a..." (merge-pathnames "main.lisp" child-dir))
-                 (copy-flie *template-dir*
-                            (merge-pathnames "main.lisp" child-dir))
-                 (println "Done.")))))
+      (let ((child-dir (mkdir (concatenate 'string project-name "/" c "/"))))
+        (format t "Copying ~a..." (merge-pathnames "main.lisp" child-dir))
+        (copy-flie *template-dir*
+                   (merge-pathnames "main.lisp" child-dir))
+        (println "Done.")))))
